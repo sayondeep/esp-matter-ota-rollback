@@ -1,0 +1,679 @@
+/dev/ttyUSB0
+0x7283
+0xDEADBEEF
+Capturing device logs
+Rebooted
+Old firmware
+Bootup Completed
+waiting for OTA trigger.
+OTA Success count: 0
+OTA Failure count: 0
+Trigger OTA
+Running: ['chip-tool', 'otasoftwareupdaterequestor', 'announce-otaprovider', '0xDEADBEEF', '0', '0', '0', '0x7283', '0x0']
+Could not get OTA Progress
+
+waiting for OTA to complete.
+
+OTA Completed
+Rebooted
+New firmware
+Bootup Completed
+waiting for rolling back.
+Trigger Rollback
+Rebooted
+Old firmware
+Bootup Completed
+waiting for OTA trigger.
+OTA Success count: 1
+OTA Failure count: 0
+Trigger OTA
+Running: ['chip-tool', 'otasoftwareupdaterequestor', 'announce-otaprovider', '0xDEADBEEF', '0', '0', '0', '0x7283', '0x0']
+Could not get OTA Progress
+
+waiting for OTA to complete.
+
+OTA Completed
+Rebooted
+New firmware
+Bootup Completed
+waiting for rolling back.
+Trigger Rollback
+Rebooted
+Old firmware
+Bootup Completed
+waiting for OTA trigger.
+OTA Success count: 2
+OTA Failure count: 0
+Trigger OTA
+Running: ['chip-tool', 'otasoftwareupdaterequestor', 'announce-otaprovider', '0xDEADBEEF', '0', '0', '0', '0x7283', '0x0']
+Could not get OTA Progress
+
+waiting for OTA to complete.
+
+OTA Completed
+Rebooted
+New firmware
+Bootup Completed
+waiting for rolling back.
+Trigger Rollback
+Rebooted
+Old firmware
+Bootup Completed
+waiting for OTA trigger.
+OTA Success count: 3
+OTA Failure count: 0
+Trigger OTA
+Running: ['chip-tool', 'otasoftwareupdaterequestor', 'announce-otaprovider', '0xDEADBEEF', '0', '0', '0', '0x7283', '0x0']
+Could not get OTA Progress
+
+waiting for OTA to complete.
+
+OTA Completed
+Rebooted
+New firmware
+Bootup Completed
+waiting for rolling back.
+Trigger Rollback
+Rebooted
+Old firmware
+Bootup Completed
+waiting for OTA trigger.
+OTA Success count: 4
+OTA Failure count: 0
+Trigger OTA
+Running: ['chip-tool', 'otasoftwareupdaterequestor', 'announce-otaprovider', '0xDEADBEEF', '0', '0', '0', '0x7283', '0x0']
+Could not get OTA Progress
+
+waiting for OTA to complete.
+
+OTA Completed
+Rebooted
+New firmware
+Bootup Completed
+waiting for rolling back.
+Trigger Rollback
+Rebooted
+Old firmware
+Bootup Completed
+waiting for OTA trigger.
+OTA Success count: 5
+OTA Failure count: 0
+Trigger OTA
+Running: ['chip-tool', 'otasoftwareupdaterequestor', 'announce-otaprovider', '0xDEADBEEF', '0', '0', '0', '0x7283', '0x0']
+Could not get OTA Progress
+
+waiting for OTA to complete.
+
+OTA Completed
+Rebooted
+New firmware
+Bootup Completed
+waiting for rolling back.
+Trigger Rollback
+Rebooted
+Old firmware
+Bootup Completed
+waiting for OTA trigger.
+OTA Success count: 6
+OTA Failure count: 0
+Trigger OTA
+Running: ['chip-tool', 'otasoftwareupdaterequestor', 'announce-otaprovider', '0xDEADBEEF', '0', '0', '0', '0x7283', '0x0']
+Could not get OTA Progress
+
+waiting for OTA to complete.
+
+OTA Completed
+Rebooted
+New firmware
+Bootup Completed
+waiting for rolling back.
+Trigger Rollback
+Rebooted
+Old firmware
+Bootup Completed
+waiting for OTA trigger.
+OTA Success count: 7
+OTA Failure count: 0
+Trigger OTA
+Running: ['chip-tool', 'otasoftwareupdaterequestor', 'announce-otaprovider', '0xDEADBEEF', '0', '0', '0', '0x7283', '0x0']
+Could not get OTA Progress
+
+waiting for OTA to complete.
+
+OTA Completed
+Rebooted
+New firmware
+Bootup Completed
+waiting for rolling back.
+Trigger Rollback
+Rebooted
+Old firmware
+Bootup Completed
+waiting for OTA trigger.
+OTA Success count: 8
+OTA Failure count: 0
+Trigger OTA
+Running: ['chip-tool', 'otasoftwareupdaterequestor', 'announce-otaprovider', '0xDEADBEEF', '0', '0', '0', '0x7283', '0x0']
+Could not get OTA Progress
+
+waiting for OTA to complete.
+
+OTA Completed
+Rebooted
+New firmware
+Bootup Completed
+waiting for rolling back.
+Trigger Rollback
+Rebooted
+Old firmware
+Bootup Completed
+waiting for OTA trigger.
+OTA Success count: 9
+OTA Failure count: 0
+Trigger OTA
+Running: ['chip-tool', 'otasoftwareupdaterequestor', 'announce-otaprovider', '0xDEADBEEF', '0', '0', '0', '0x7283', '0x0']
+Could not get OTA Progress
+
+waiting for OTA to complete.
+
+OTA Completed
+Rebooted
+New firmware
+Bootup Completed
+waiting for rolling back.
+Trigger Rollback
+Rebooted
+Old firmware
+Bootup Completed
+waiting for OTA trigger.
+OTA Success count: 10
+OTA Failure count: 0
+Trigger OTA
+Running: ['chip-tool', 'otasoftwareupdaterequestor', 'announce-otaprovider', '0xDEADBEEF', '0', '0', '0', '0x7283', '0x0']
+Could not get OTA Progress
+
+waiting for OTA to complete.
+
+OTA Completed
+Rebooted
+New firmware
+Bootup Completed
+waiting for rolling back.
+Trigger Rollback
+Rebooted
+Old firmware
+Bootup Completed
+waiting for OTA trigger.
+OTA Success count: 11
+OTA Failure count: 0
+Trigger OTA
+Running: ['chip-tool', 'otasoftwareupdaterequestor', 'announce-otaprovider', '0xDEADBEEF', '0', '0', '0', '0x7283', '0x0']
+Could not get OTA Progress
+
+waiting for OTA to complete.
+
+OTA Completed
+Rebooted
+New firmware
+Bootup Completed
+waiting for rolling back.
+Trigger Rollback
+Rebooted
+Old firmware
+Bootup Completed
+waiting for OTA trigger.
+OTA Success count: 12
+OTA Failure count: 0
+Trigger OTA
+Running: ['chip-tool', 'otasoftwareupdaterequestor', 'announce-otaprovider', '0xDEADBEEF', '0', '0', '0', '0x7283', '0x0']
+Could not get OTA Progress
+
+waiting for OTA to complete.
+
+OTA Completed
+Rebooted
+New firmware
+Bootup Completed
+waiting for rolling back.
+Trigger Rollback
+Rebooted
+Old firmware
+Bootup Completed
+waiting for OTA trigger.
+OTA Success count: 13
+OTA Failure count: 0
+Trigger OTA
+Running: ['chip-tool', 'otasoftwareupdaterequestor', 'announce-otaprovider', '0xDEADBEEF', '0', '0', '0', '0x7283', '0x0']
+Could not get OTA Progress
+
+waiting for OTA to complete.
+
+OTA Completed
+Rebooted
+New firmware
+Bootup Completed
+waiting for rolling back.
+Trigger Rollback
+Rebooted
+Old firmware
+Bootup Completed
+waiting for OTA trigger.
+OTA Success count: 14
+OTA Failure count: 0
+Trigger OTA
+Running: ['chip-tool', 'otasoftwareupdaterequestor', 'announce-otaprovider', '0xDEADBEEF', '0', '0', '0', '0x7283', '0x0']
+Could not get OTA Progress
+
+waiting for OTA to complete.
+
+OTA Completed
+Rebooted
+New firmware
+Bootup Completed
+waiting for rolling back.
+Trigger Rollback
+Rebooted
+Old firmware
+Bootup Completed
+waiting for OTA trigger.
+OTA Success count: 15
+OTA Failure count: 0
+Trigger OTA
+Running: ['chip-tool', 'otasoftwareupdaterequestor', 'announce-otaprovider', '0xDEADBEEF', '0', '0', '0', '0x7283', '0x0']
+Could not get OTA Progress
+
+waiting for OTA to complete.
+
+OTA Completed
+Rebooted
+New firmware
+Bootup Completed
+waiting for rolling back.
+Trigger Rollback
+Rebooted
+Old firmware
+Bootup Completed
+waiting for OTA trigger.
+OTA Success count: 16
+OTA Failure count: 0
+Trigger OTA
+Running: ['chip-tool', 'otasoftwareupdaterequestor', 'announce-otaprovider', '0xDEADBEEF', '0', '0', '0', '0x7283', '0x0']
+Could not get OTA Progress
+
+waiting for OTA to complete.
+
+OTA Completed
+Rebooted
+New firmware
+Bootup Completed
+waiting for rolling back.
+Trigger Rollback
+Rebooted
+Old firmware
+Bootup Completed
+waiting for OTA trigger.
+OTA Success count: 17
+OTA Failure count: 0
+Trigger OTA
+Running: ['chip-tool', 'otasoftwareupdaterequestor', 'announce-otaprovider', '0xDEADBEEF', '0', '0', '0', '0x7283', '0x0']
+Could not get OTA Progress
+
+waiting for OTA to complete.
+
+OTA Completed
+Rebooted
+New firmware
+Bootup Completed
+waiting for rolling back.
+Trigger Rollback
+Rebooted
+Old firmware
+Bootup Completed
+waiting for OTA trigger.
+OTA Success count: 18
+OTA Failure count: 0
+Trigger OTA
+Running: ['chip-tool', 'otasoftwareupdaterequestor', 'announce-otaprovider', '0xDEADBEEF', '0', '0', '0', '0x7283', '0x0']
+Could not get OTA Progress
+
+waiting for OTA to complete.
+
+OTA Completed
+Rebooted
+New firmware
+Bootup Completed
+waiting for rolling back.
+Trigger Rollback
+Rebooted
+Old firmware
+Bootup Completed
+waiting for OTA trigger.
+OTA Success count: 19
+OTA Failure count: 0
+Trigger OTA
+Running: ['chip-tool', 'otasoftwareupdaterequestor', 'announce-otaprovider', '0xDEADBEEF', '0', '0', '0', '0x7283', '0x0']
+Could not get OTA Progress
+
+waiting for OTA to complete.
+
+OTA Completed
+Rebooted
+New firmware
+Bootup Completed
+waiting for rolling back.
+Trigger Rollback
+Rebooted
+Old firmware
+Bootup Completed
+waiting for OTA trigger.
+OTA Success count: 20
+OTA Failure count: 0
+Trigger OTA
+Running: ['chip-tool', 'otasoftwareupdaterequestor', 'announce-otaprovider', '0xDEADBEEF', '0', '0', '0', '0x7283', '0x0']
+Could not get OTA Progress
+
+waiting for OTA to complete.
+
+OTA Completed
+Rebooted
+New firmware
+Bootup Completed
+waiting for rolling back.
+Trigger Rollback
+Rebooted
+Old firmware
+Bootup Completed
+waiting for OTA trigger.
+OTA Success count: 21
+OTA Failure count: 0
+Trigger OTA
+Running: ['chip-tool', 'otasoftwareupdaterequestor', 'announce-otaprovider', '0xDEADBEEF', '0', '0', '0', '0x7283', '0x0']
+Could not get OTA Progress
+
+waiting for OTA to complete.
+
+OTA Completed
+Rebooted
+New firmware
+Bootup Completed
+waiting for rolling back.
+Trigger Rollback
+Rebooted
+Old firmware
+Bootup Completed
+waiting for OTA trigger.
+OTA Success count: 22
+OTA Failure count: 0
+Trigger OTA
+Running: ['chip-tool', 'otasoftwareupdaterequestor', 'announce-otaprovider', '0xDEADBEEF', '0', '0', '0', '0x7283', '0x0']
+Could not get OTA Progress
+
+waiting for OTA to complete.
+
+OTA Completed
+Rebooted
+New firmware
+Bootup Completed
+waiting for rolling back.
+Trigger Rollback
+Rebooted
+Old firmware
+Bootup Completed
+waiting for OTA trigger.
+OTA Success count: 23
+OTA Failure count: 0
+Trigger OTA
+Running: ['chip-tool', 'otasoftwareupdaterequestor', 'announce-otaprovider', '0xDEADBEEF', '0', '0', '0', '0x7283', '0x0']
+Could not get OTA Progress
+
+waiting for OTA to complete.
+
+OTA Completed
+Rebooted
+New firmware
+Bootup Completed
+waiting for rolling back.
+Trigger Rollback
+Rebooted
+Old firmware
+Bootup Completed
+waiting for OTA trigger.
+OTA Success count: 24
+OTA Failure count: 0
+Trigger OTA
+Running: ['chip-tool', 'otasoftwareupdaterequestor', 'announce-otaprovider', '0xDEADBEEF', '0', '0', '0', '0x7283', '0x0']
+Could not get OTA Progress
+
+waiting for OTA to complete.
+
+OTA Completed
+Rebooted
+New firmware
+Bootup Completed
+waiting for rolling back.
+Trigger Rollback
+Rebooted
+Old firmware
+Bootup Completed
+waiting for OTA trigger.
+OTA Success count: 25
+OTA Failure count: 0
+Trigger OTA
+Running: ['chip-tool', 'otasoftwareupdaterequestor', 'announce-otaprovider', '0xDEADBEEF', '0', '0', '0', '0x7283', '0x0']
+Could not get OTA Progress
+
+waiting for OTA to complete.
+
+OTA Completed
+Rebooted
+New firmware
+Bootup Completed
+waiting for rolling back.
+Trigger Rollback
+Rebooted
+Old firmware
+Bootup Completed
+waiting for OTA trigger.
+OTA Success count: 26
+OTA Failure count: 0
+Trigger OTA
+Running: ['chip-tool', 'otasoftwareupdaterequestor', 'announce-otaprovider', '0xDEADBEEF', '0', '0', '0', '0x7283', '0x0']
+Could not get OTA Progress
+
+waiting for OTA to complete.
+
+OTA Completed
+Rebooted
+New firmware
+Bootup Completed
+waiting for rolling back.
+Trigger Rollback
+Rebooted
+Old firmware
+Bootup Completed
+waiting for OTA trigger.
+OTA Success count: 27
+OTA Failure count: 0
+Trigger OTA
+Running: ['chip-tool', 'otasoftwareupdaterequestor', 'announce-otaprovider', '0xDEADBEEF', '0', '0', '0', '0x7283', '0x0']
+Could not get OTA Progress
+
+waiting for OTA to complete.
+
+OTA Completed
+Rebooted
+New firmware
+Bootup Completed
+waiting for rolling back.
+Trigger Rollback
+Rebooted
+Old firmware
+Bootup Completed
+waiting for OTA trigger.
+OTA Success count: 28
+OTA Failure count: 0
+Trigger OTA
+Running: ['chip-tool', 'otasoftwareupdaterequestor', 'announce-otaprovider', '0xDEADBEEF', '0', '0', '0', '0x7283', '0x0']
+Could not get OTA Progress
+
+waiting for OTA to complete.
+
+OTA Completed
+Rebooted
+New firmware
+Bootup Completed
+waiting for rolling back.
+Trigger Rollback
+Rebooted
+Old firmware
+Bootup Completed
+waiting for OTA trigger.
+OTA Success count: 29
+OTA Failure count: 0
+Trigger OTA
+Running: ['chip-tool', 'otasoftwareupdaterequestor', 'announce-otaprovider', '0xDEADBEEF', '0', '0', '0', '0x7283', '0x0']
+Could not get OTA Progress
+
+waiting for OTA to complete.
+
+OTA Completed
+Rebooted
+New firmware
+Bootup Completed
+waiting for rolling back.
+Trigger Rollback
+Rebooted
+Old firmware
+Bootup Completed
+waiting for OTA trigger.
+OTA Success count: 30
+OTA Failure count: 0
+Trigger OTA
+Running: ['chip-tool', 'otasoftwareupdaterequestor', 'announce-otaprovider', '0xDEADBEEF', '0', '0', '0', '0x7283', '0x0']
+Could not get OTA Progress
+
+waiting for OTA to complete.
+
+OTA Completed
+Rebooted
+New firmware
+Bootup Completed
+waiting for rolling back.
+Trigger Rollback
+Rebooted
+Old firmware
+Bootup Completed
+waiting for OTA trigger.
+OTA Success count: 31
+OTA Failure count: 0
+Trigger OTA
+Running: ['chip-tool', 'otasoftwareupdaterequestor', 'announce-otaprovider', '0xDEADBEEF', '0', '0', '0', '0x7283', '0x0']
+Could not get OTA Progress
+
+waiting for OTA to complete.
+
+OTA Completed
+Rebooted
+New firmware
+Bootup Completed
+waiting for rolling back.
+Trigger Rollback
+Rebooted
+Old firmware
+Bootup Completed
+waiting for OTA trigger.
+OTA Success count: 32
+OTA Failure count: 0
+Trigger OTA
+Running: ['chip-tool', 'otasoftwareupdaterequestor', 'announce-otaprovider', '0xDEADBEEF', '0', '0', '0', '0x7283', '0x0']
+Could not get OTA Progress
+
+waiting for OTA to complete.
+
+OTA Completed
+Rebooted
+New firmware
+Bootup Completed
+waiting for rolling back.
+Trigger Rollback
+Rebooted
+Old firmware
+Bootup Completed
+waiting for OTA trigger.
+OTA Success count: 33
+OTA Failure count: 0
+Trigger OTA
+Running: ['chip-tool', 'otasoftwareupdaterequestor', 'announce-otaprovider', '0xDEADBEEF', '0', '0', '0', '0x7283', '0x0']
+Could not get OTA Progress
+
+waiting for OTA to complete.
+
+OTA Completed
+Rebooted
+New firmware
+Bootup Completed
+waiting for rolling back.
+Trigger Rollback
+Rebooted
+Old firmware
+Bootup Completed
+waiting for OTA trigger.
+OTA Success count: 34
+OTA Failure count: 0
+Trigger OTA
+Running: ['chip-tool', 'otasoftwareupdaterequestor', 'announce-otaprovider', '0xDEADBEEF', '0', '0', '0', '0x7283', '0x0']
+Could not get OTA Progress
+
+waiting for OTA to complete.
+
+OTA Completed
+Rebooted
+New firmware
+Bootup Completed
+waiting for rolling back.
+Trigger Rollback
+Rebooted
+Old firmware
+Bootup Completed
+waiting for OTA trigger.
+OTA Success count: 35
+OTA Failure count: 0
+Trigger OTA
+Running: ['chip-tool', 'otasoftwareupdaterequestor', 'announce-otaprovider', '0xDEADBEEF', '0', '0', '0', '0x7283', '0x0']
+Could not get OTA Progress
+
+waiting for OTA to complete.
+
+OTA Completed
+Rebooted
+New firmware
+Bootup Completed
+waiting for rolling back.
+Trigger Rollback
+Rebooted
+Old firmware
+Bootup Completed
+waiting for OTA trigger.
+OTA Success count: 36
+OTA Failure count: 0
+Trigger OTA
+Running: ['chip-tool', 'otasoftwareupdaterequestor', 'announce-otaprovider', '0xDEADBEEF', '0', '0', '0', '0x7283', '0x0']
+Could not get OTA Progress
+
+waiting for OTA to complete.
+
+OTA Completed
+Rebooted
+New firmware
+Bootup Completed
+waiting for rolling back.
+Trigger Rollback
+Rebooted
+Old firmware
+Bootup Completed
+waiting for OTA trigger.
+OTA Success count: 37
+OTA Failure count: 0
+Trigger OTA
+Running: ['chip-tool', 'otasoftwareupdaterequestor', 'announce-otaprovider', '0xDEADBEEF', '0', '0', '0', '0x7283', '0x0']
+Could not get OTA Progress

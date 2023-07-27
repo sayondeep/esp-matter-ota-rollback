@@ -1,0 +1,15 @@
+{
+    "deviceSoftwareVersionModel": [
+        {
+            "vendorId": 4891,
+            "productId": 2,
+            "softwareVersion": 10010001,
+            "softwareVersionString": "1.1.1-be5e421",
+            "cDVersionNumber": 18,
+            "softwareVersionValid": true,
+            "minApplicableSoftwareVersion": 0,
+            "maxApplicableSoftwareVersion": 10010000,
+            "otaURL": "/home/sayon/esp/myproj/ota_rollback/input/test.bin"
+        }
+    ]
+}
