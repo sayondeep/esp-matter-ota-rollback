@@ -1,0 +1,263 @@
+import threading
+import time
+from enum import Enum
+import curses
+import subprocess
+import os
+
+pairing_codes=["MT:634J0KQS02KA0648G00"]
+# pairing_codes=["MT:634J0CEK01KA0648G00"]
+# pairing_codes=["MT:634J0KQS02KA0648G00","MT:634J0CEK01KA0648G00"]
+
+base_nodeid=7700
+
+SSID="TP-Link_2EA4"
+passphrase="14754210"
+
+# SSID="DIR-825-5723"
+# passphrase="32129434"
+
+ota_provider_node_id = "0xDEADBEEF"
+
+device_statuses = {
+    7700: "waiting for commission.",
+    # 7701: "waiting for commission.",
+}
+
+commission_successful_log="CHIP:TOO: Device commissioning completed with success"
+
+class device_state(Enum):
+    waiting_for_commission=0
+    commissioning_started=1
+    commision_completed = 2
+    getting_old_firmware=3
+    got_old_firmware=4
+    waiting_for_ota_complete = 5
+    ongoing_ota=6
+    ota_completed = 7
+    getting_new_firmware=8
+    got_new_firmware=9
+    operation_completed=10
+
+
+current_state = [device_state.waiting_for_commission]* len(pairing_codes)
+
+
+def perform_operations(node_id,qr_code):
+    index = node_id-base_nodeid
+
+    while current_state[index] is not device_state.operation_completed:
+        if(current_state[index]==device_state.waiting_for_commission):
+            trigger_commissioning(node_id,qr_code)
+        if(current_state[index]==device_state.commision_completed):
+            current_state[index]= device_state.getting_old_firmware
+            time.sleep(10)
+            check_for_firmware_version(node_id)
+        if(current_state[index]==device_state.got_old_firmware):
+            trigger_ota(node_id,ota_provider_node_id)
+        if(current_state[index]==device_state.waiting_for_ota_complete):
+            time.sleep(10)
+            check_for_ota_percentage(node_id)
+        if(current_state[index]==device_state.ota_completed):
+            curr_percent=check_for_ota_percentage(node_id)
+            while str(curr_percent) != 'null':
+                device_statuses[node_id]+="-->"+str(curr_percent)
+                time.sleep(10)
+                curr_percent=check_for_ota_percentage(node_id)
+            current_state[index]= device_state.getting_new_firmware
+            time.sleep(10)
+            check_for_firmware_version(node_id)
+        if(current_state[index]==device_state.got_new_firmware):
+            current_state[index]= device_state.operation_completed
+
+
+def trigger_commissioning(node_id,qr_code):
+    
+    chip_tool_command = ['chip-tool', 'pairing', 'code-wifi',str(node_id), str(SSID), str(passphrase),str(qr_code)]
+    current_state[node_id-base_nodeid]=device_state.commissioning_started
+    device_statuses[node_id]+="-->ongoing commission."
+
+    result = subprocess.run(chip_tool_command, capture_output=True, text=True)
+
+    lines = result.stdout.split("\n")
+
+    for line in lines:
+        if commission_successful_log in line:
+            current_state[node_id-base_nodeid]=device_state.commision_completed
+            device_statuses[node_id]+="-->commission success."
+
+
+def check_for_firmware_version(node_id):
+    # print("checking firmware version")
+    index = node_id-base_nodeid
+    chip_tool_command = ['chip-tool', 'basicinformation', 'read', 'software-version', str(node_id), '0x0']
+
+    result = subprocess.run(chip_tool_command, capture_output=True, text=True)
+
+    lines = result.stdout.split("\n")
+
+    sw_ver = -1
+
+    for line in lines:
+        if "CHIP:TOO:   SoftwareVersion:" in line:
+            line_parts = line.split("SoftwareVersion: ")
+            sw_ver = line_parts[1]
+            break
+
+    # print("\nS/W version: " + str(sw_ver) + "for" +str(node_id), end="")
+    if(float(sw_ver)>0 and current_state[index]== device_state.getting_old_firmware):
+        device_statuses[node_id]+= "-->has software version:" + str(sw_ver)
+        current_state[node_id-base_nodeid]=device_state.got_old_firmware
+    
+    if(float(sw_ver)>0 and current_state[index]== device_state.getting_new_firmware):
+        device_statuses[node_id]+= "-->has software version:" + str(sw_ver)
+        current_state[node_id-base_nodeid]=device_state.got_new_firmware
+
+
+def trigger_ota(node_id, ota_provider_node_id):
+
+    index = node_id-base_nodeid
+    time.sleep(25)
+    current_state[index] = device_state.waiting_for_ota_complete
+    device_statuses[node_id] += "-->OTA triggered."
+
+    # new_path = os.path.expanduser("~/esp/esp-matter/connectedhomeip/connectedhomeip/out/host")
+    # os.environ["PATH"] = f"{os.environ['PATH']}:{new_path}"
+    ota_trigger_command = ['chip-tool', 'otasoftwareupdaterequestor', 'announce-otaprovider', ota_provider_node_id, '0', '0', '0', str(node_id), '0x0']
+
+    result = subprocess.run(ota_trigger_command, capture_output=True, text=True)
+
+def check_for_ota_percentage(node_id):
+    ota_progress = 0
+
+    result = subprocess.run(['chip-tool', 'otasoftwareupdaterequestor', 'read', 'update-state-progress', str(node_id), '0x0'], capture_output=True, text=True)
+    lines = result.stdout.split("\n")
+
+    for line in lines:
+        if "CHIP:TOO:   UpdateStateProgress:" in line:
+            line_parts = line.split("UpdateStateProgress: ")
+            ota_progress = line_parts[1]
+            break
+
+
+    if current_state[node_id-base_nodeid]==device_state.waiting_for_ota_complete:
+
+        if(device_statuses[node_id][-1]=='%'):
+            device_statuses[node_id]=device_statuses[node_id][:-23]
+        
+        device_statuses[node_id]+="--> ota progress at "+ str(ota_progress)+"%"
+
+        if ota_progress is not None and int(ota_progress)>=90:
+            current_state[node_id-base_nodeid]=device_state.ota_completed
+            device_statuses[node_id]+="--> ota completing..."
+
+    if current_state[node_id-base_nodeid]==device_state.ota_completed:
+        return ota_progress
+
+def setup_for_ota(stdscr,pairing_codes):
+
+    # Create a thread for each node and start operations
+
+    threads = []
+    for index in range(len(pairing_codes)):
+        node_id = base_nodeid + index
+        qr_code = pairing_codes[index]
+        thread = threading.Thread(target=perform_operations, args=(node_id, qr_code))
+        threads.append(thread)
+        thread.start()
+    
+    # check_for_firmware_version(node_id)
+
+    stdscr.clear()
+    try:
+        while True:
+            for index in range(len(pairing_codes)):
+                node_id = base_nodeid + index
+                status = device_statuses[node_id]
+                stdscr.addstr(index, 0, f"{node_id} : {pairing_codes[index]} : {status}")
+            stdscr.refresh()
+            time.sleep(1)  # Adjust the sleep interval as needed
+            
+    
+    except KeyboardInterrupt:
+        pass
+
+    # Wait for all threads to finish
+    for thread in threads:
+        thread.join()
+
+    print("All processes finished.")
+
+
+def main():
+
+    curses.wrapper(setup_for_ota,pairing_codes)
+
+
+if __name__ == '__main__':
+    main()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# def ota_progress(stdscr):
+#     stdscr.clear()
+#     try:
+#         while True:
+#             # Print all lines at once
+#             for index, line in enumerate(lines):
+#                 stdscr.addstr(index, 0, line)
+#             stdscr.refresh()
+#             time.sleep(1)  # Adjust the sleep interval as needed
+#             stdscr.clear()  # Clear all lines
+#     except KeyboardInterrupt:
+#         pass
+
+#     for flag in exit_flags:
+#         flag.set()
+#     for thread in update_threads:
+#         thread.join()
+
+# curses.wrapper(main)
