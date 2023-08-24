@@ -5,9 +5,11 @@ import curses
 import subprocess
 import os
 
-pairing_codes=["MT:634J0KQS02KA0648G00"]
+# pairing_codes=["MT:634J0KQS02KA0648G00"]
 # pairing_codes=["MT:634J0CEK01KA0648G00"]
 # pairing_codes=["MT:634J0KQS02KA0648G00","MT:634J0CEK01KA0648G00"]
+
+pairing_codes=["MT:Q3R000QV17-HKA3K.00"]
 
 base_nodeid=7700
 
@@ -20,7 +22,7 @@ passphrase="14754210"
 ota_provider_node_id = "0xDEADBEEF"
 
 device_statuses = {
-    7700: "waiting for commission.",
+    # 7700: "waiting for commission.",
     # 7701: "waiting for commission.",
 }
 
@@ -37,11 +39,24 @@ class device_state(Enum):
     ota_completed = 7
     getting_new_firmware=8
     got_new_firmware=9
-    operation_completed=10
+    resetting_to_factory=10
+    factory_reset_success=11
+    operation_completed=12
 
 
 current_state = [device_state.waiting_for_commission]* len(pairing_codes)
+ota_progress_tracker = [[0 for _ in range(101)] for _ in range(len(pairing_codes))]
 
+
+def error_(node_id):
+
+    index = node_id-base_nodeid
+    
+    color_change_command = ['chip-tool', 'colorcontrol', 'move-to-hue', '0','0', '0', '0', '0', str(node_id), '0x1']
+    result = subprocess.run(color_change_command, capture_output=True, text=True)
+    
+    current_state[index] = device_state.operation_completed
+    device_statuses[node_id] += "-->Error Occured."
 
 def perform_operations(node_id,qr_code):
     index = node_id-base_nodeid
@@ -65,15 +80,19 @@ def perform_operations(node_id,qr_code):
                 time.sleep(10)
                 curr_percent=check_for_ota_percentage(node_id)
             current_state[index]= device_state.getting_new_firmware
-            time.sleep(10)
+            time.sleep(20)
             check_for_firmware_version(node_id)
         if(current_state[index]==device_state.got_new_firmware):
-            current_state[index]= device_state.operation_completed
+            time.sleep(10)
+            current_state[index]= device_state.resetting_to_factory
+            reset_to_factory(node_id)
+        if(current_state[index]==device_state.factory_reset_success):
+            current_state[index]=device_state.operation_completed
 
 
 def trigger_commissioning(node_id,qr_code):
     
-    chip_tool_command = ['chip-tool', 'pairing', 'code-wifi',str(node_id), str(SSID), str(passphrase),str(qr_code)]
+    chip_tool_command = ['chip-tool', 'pairing', 'code-wifi',str(node_id), str(SSID), str(passphrase),str(qr_code),'--paa-trust-store-path','/home/sayon/esp/ESP-PAA/main_net']
     current_state[node_id-base_nodeid]=device_state.commissioning_started
     device_statuses[node_id]+="-->ongoing commission."
 
@@ -118,6 +137,11 @@ def trigger_ota(node_id, ota_provider_node_id):
 
     index = node_id-base_nodeid
     time.sleep(25)
+    
+    color_change_command = ['chip-tool', 'colorcontrol', 'move-to-hue', '120','0', '0', '0', '0', str(node_id), '0x1']
+    result = subprocess.run(color_change_command, capture_output=True, text=True)
+    
+    time.sleep(10)
     current_state[index] = device_state.waiting_for_ota_complete
     device_statuses[node_id] += "-->OTA triggered."
 
@@ -139,6 +163,13 @@ def check_for_ota_percentage(node_id):
             ota_progress = line_parts[1]
             break
 
+    index = node_id-base_nodeid
+    if str(ota_progress)!='null' and int(ota_progress)>=0:
+        ota_progress_tracker [index][int(ota_progress)]+=1
+        if(ota_progress_tracker [index][int(ota_progress)]>=4):
+            error_(node_id)
+
+
 
     if current_state[node_id-base_nodeid]==device_state.waiting_for_ota_complete:
 
@@ -147,13 +178,34 @@ def check_for_ota_percentage(node_id):
         
         device_statuses[node_id]+="--> ota progress at "+ str(ota_progress)+"%"
 
-        if ota_progress is not None and int(ota_progress)>=90:
+        if str(ota_progress)!='null' and int(ota_progress)>=90:
+            color_change_command = ['chip-tool', 'colorcontrol', 'move-to-hue', '60','0', '0', '0', '0', str(node_id), '0x1']
+            result = subprocess.run(color_change_command, capture_output=True, text=True)
+            time.sleep(5)
             current_state[node_id-base_nodeid]=device_state.ota_completed
             device_statuses[node_id]+="--> ota completing..."
 
     if current_state[node_id-base_nodeid]==device_state.ota_completed:
         return ota_progress
 
+def reset_to_factory(node_id):
+    index= node_id-base_nodeid
+    fabric_id = -1
+    result = subprocess.run(['chip-tool', 'operationalcredentials', 'read', 'current-fabric-index', str(node_id), '0x0'], capture_output=True, text=True)
+    lines = result.stdout.split("\n")
+
+    for line in lines:
+        if "CHIP:TOO:   CurrentFabricIndex:" in line:
+            line_parts = line.split("CurrentFabricIndex: ")
+            fabric_id = line_parts[1]
+            break
+    
+    if str(fabric_id)=='1':
+        result = subprocess.run(['chip-tool', 'operationalcredentials', 'remove-fabric', str(fabric_id), str(node_id), '0x0'], capture_output=True, text=True)
+        current_state[index]=device_state.factory_reset_success
+        device_statuses[node_id]+="-->device reset to factory."
+
+    
 def setup_for_ota(stdscr,pairing_codes):
 
     # Create a thread for each node and start operations
@@ -162,9 +214,11 @@ def setup_for_ota(stdscr,pairing_codes):
     for index in range(len(pairing_codes)):
         node_id = base_nodeid + index
         qr_code = pairing_codes[index]
+        device_statuses[int(node_id)]= "waiting for commissioning.."
         thread = threading.Thread(target=perform_operations, args=(node_id, qr_code))
         threads.append(thread)
         thread.start()
+        # thread.join()
     
     # check_for_firmware_version(node_id)
 
