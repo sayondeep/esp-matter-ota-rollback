@@ -7,9 +7,9 @@ import os
 
 # pairing_codes=["MT:634J0KQS02KA0648G00"]
 # pairing_codes=["MT:634J0CEK01KA0648G00"]
-# pairing_codes=["MT:634J0KQS02KA0648G00","MT:634J0CEK01KA0648G00"]
+pairing_codes=["MT:634J0KQS02KA0648G00","MT:634J0CEK01KA0648G00"]
 
-pairing_codes=["MT:Q3R000QV17-HKA3K.00"]
+# pairing_codes=["MT:Q3R000QV17-HKA3K.00"] #real_bulb
 
 base_nodeid=7700
 
@@ -63,6 +63,7 @@ def perform_operations(node_id,qr_code):
 
     while current_state[index] is not device_state.operation_completed:
         if(current_state[index]==device_state.waiting_for_commission):
+            time.sleep(5)
             trigger_commissioning(node_id,qr_code)
         if(current_state[index]==device_state.commision_completed):
             current_state[index]= device_state.getting_old_firmware
@@ -80,11 +81,12 @@ def perform_operations(node_id,qr_code):
                 time.sleep(10)
                 curr_percent=check_for_ota_percentage(node_id)
             current_state[index]= device_state.getting_new_firmware
-            time.sleep(20)
+            time.sleep(10)
             check_for_firmware_version(node_id)
         if(current_state[index]==device_state.got_new_firmware):
             time.sleep(10)
             current_state[index]= device_state.resetting_to_factory
+            device_statuses[node_id]+="-->resetting to factory."
             reset_to_factory(node_id)
         if(current_state[index]==device_state.factory_reset_success):
             current_state[index]=device_state.operation_completed
@@ -92,7 +94,8 @@ def perform_operations(node_id,qr_code):
 
 def trigger_commissioning(node_id,qr_code):
     
-    chip_tool_command = ['chip-tool', 'pairing', 'code-wifi',str(node_id), str(SSID), str(passphrase),str(qr_code),'--paa-trust-store-path','/home/sayon/esp/ESP-PAA/main_net']
+    # chip_tool_command = ['chip-tool', 'pairing', 'code-wifi',str(node_id), str(SSID), str(passphrase),str(qr_code),'--paa-trust-store-path','/home/sayon/esp/ESP-PAA/main_net']
+    chip_tool_command = ['chip-tool', 'pairing', 'code-wifi',str(node_id), str(SSID), str(passphrase),str(qr_code)]
     current_state[node_id-base_nodeid]=device_state.commissioning_started
     device_statuses[node_id]+="-->ongoing commission."
 
@@ -205,8 +208,9 @@ def reset_to_factory(node_id):
         current_state[index]=device_state.factory_reset_success
         device_statuses[node_id]+="-->device reset to factory."
 
+stop_event = threading.Event()
     
-def setup_for_ota(stdscr,pairing_codes):
+def setup_for_ota(pairing_codes):
 
     # Create a thread for each node and start operations
 
@@ -218,9 +222,31 @@ def setup_for_ota(stdscr,pairing_codes):
         thread = threading.Thread(target=perform_operations, args=(node_id, qr_code))
         threads.append(thread)
         thread.start()
-        # thread.join()
+        thread.join(1000)
     
     # check_for_firmware_version(node_id)
+
+        # Wait for all threads to finish
+    for thread in threads:
+        if thread.is_alive():
+            # Signal the thread to stop
+            stop_event.set()
+            # Wait for the worker thread to complete
+            thread.join()
+
+
+
+
+def main(stdscr):
+
+    # curses.wrapper(setup_for_ota,pairing_codes)
+    
+    for index in range(len(pairing_codes)):
+        node_id = base_nodeid+index
+        device_statuses[node_id]=""
+    
+    set_up_ota_thread = threading.Thread(target=setup_for_ota,args=(pairing_codes,))
+    set_up_ota_thread.start()
 
     stdscr.clear()
     try:
@@ -236,20 +262,14 @@ def setup_for_ota(stdscr,pairing_codes):
     except KeyboardInterrupt:
         pass
 
-    # Wait for all threads to finish
-    for thread in threads:
-        thread.join()
+    set_up_ota_thread.join()
 
     print("All processes finished.")
 
 
-def main():
-
-    curses.wrapper(setup_for_ota,pairing_codes)
-
-
 if __name__ == '__main__':
-    main()
+    # main()
+    curses.wrapper(main)
 
 
 
