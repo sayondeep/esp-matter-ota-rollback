@@ -15,11 +15,11 @@ pairing_codes=["MT:634J0KQS02KA0648G00","MT:634J0CEK01KA0648G00"]
 
 base_nodeid=7700
 
-SSID="TP-Link_2EA4"
-passphrase="14754210"
+# SSID="TP-Link_2EA4"
+# passphrase="14754210"
 
-# SSID="DIR-825-5723"
-# passphrase="32129434"
+SSID="DIR-825-5723"
+passphrase="32129434"
 
 ota_provider_node_id = "0xDEADBEEF"
 
@@ -36,7 +36,7 @@ class device_state(Enum):
     commision_completed = 2
     getting_old_firmware=3
     got_old_firmware=4
-    waiting_for_ota_complete = 5
+    waiting_for_ota = 5
     ongoing_ota=6
     ota_completed = 7
     getting_new_firmware=8
@@ -55,7 +55,7 @@ chip_lock = Lock()
 ota_lock = Lock()
 
 
-def error_(node_id):
+def error_(node_id,reason):
 
     index = node_id-base_nodeid
     
@@ -64,26 +64,50 @@ def error_(node_id):
     result = subprocess.run(color_change_command, capture_output=True, text=True)
     
     current_state[index] = device_state.operation_completed
-    device_statuses[node_id] += "-->Error Occured."
+    device_statuses[node_id] += "-->Error Occured." + str(reason)
     chip_lock.release()
-    ota_lock.release()
+    if 'OTA' in reason:
+        ota_lock.release()
 
 def perform_operations(node_id,qr_code):
     index = node_id-base_nodeid
+    commissioning_retry_count=0
+    old_firmware_fetch_retry_count=0
+    ota_retry_count=0
+    new_firmware_fetch_retry_count=0
 
+    
     while current_state[index] is not device_state.operation_completed:
         if(current_state[index]==device_state.waiting_for_commission):
             time.sleep(5)
-            trigger_commissioning(node_id,qr_code)
+            if(commissioning_retry_count<4):
+                commissioning_retry_count+=1
+                trigger_commissioning(node_id,qr_code)
+            else:
+                error_(node_id,"in commissioning.")
+
         if(current_state[index]==device_state.commision_completed):
             current_state[index]= device_state.getting_old_firmware
+            
+        if(current_state[index]== device_state.getting_old_firmware):
             time.sleep(10)
-            check_for_firmware_version(node_id)
+            if(old_firmware_fetch_retry_count<4):
+                old_firmware_fetch_retry_count+=1
+                check_for_firmware_version(node_id)
+            else:
+                error_(node_id,"in old firmware ver. fetching.")
+
         if(current_state[index]==device_state.got_old_firmware):
+            current_state[index]= device_state.waiting_for_ota
+            device_statuses[node_id] += "-->waiting for ota.."
+
+        if(current_state[index]==device_state.waiting_for_ota):
             trigger_ota(node_id,ota_provider_node_id)
-        if(current_state[index]==device_state.waiting_for_ota_complete):
+
+        if(current_state[index]==device_state.ongoing_ota):
             time.sleep(10)
             check_for_ota_percentage(node_id)
+
         if(current_state[index]==device_state.ota_completed):
             curr_percent=check_for_ota_percentage(node_id)
             while str(curr_percent) != 'null':
@@ -91,15 +115,25 @@ def perform_operations(node_id,qr_code):
                 time.sleep(10)
                 curr_percent=check_for_ota_percentage(node_id)
 
+            device_statuses[node_id] += "-->OTA completed successfully."
             ota_lock.release()
             current_state[index]= device_state.getting_new_firmware
+            
+
+        if(current_state[index]== device_state.getting_new_firmware):
             time.sleep(10)
-            check_for_firmware_version(node_id)
+            if(new_firmware_fetch_retry_count<4):
+                new_firmware_fetch_retry_count+=1
+                check_for_firmware_version(node_id)
+            else:
+                error_(node_id,"in new firmware ver. fetching.")
+
         if(current_state[index]==device_state.got_new_firmware):
             time.sleep(10)
             current_state[index]= device_state.resetting_to_factory
             device_statuses[node_id]+="-->resetting to factory."
             reset_to_factory(node_id)
+
         if(current_state[index]==device_state.factory_reset_success):
             current_state[index]=device_state.operation_completed
 
@@ -116,12 +150,27 @@ def trigger_commissioning(node_id,qr_code):
 
     lines = result.stdout.split("\n")
 
+    chip_lock.release()
+
+    is_commissioned= False
     for line in lines:
         if commission_successful_log in line:
-            current_state[node_id-base_nodeid]=device_state.commision_completed
-            device_statuses[node_id]+="-->commission success."
+            is_commissioned=True
+
+    if(is_commissioned):
+        chip_lock.acquire()
+        color_change_command = ['chip-tool', 'colorcontrol', 'move-to-hue', '180','0', '0', '0', '0', str(node_id), '0x1']
+        result = subprocess.run(color_change_command, capture_output=True, text=True)
+        current_state[node_id-base_nodeid]=device_state.commision_completed
+        device_statuses[node_id]+="-->commission success."
+        chip_lock.release()
+        
+    else:
+        current_state[node_id-base_nodeid]=device_state.waiting_for_commission
+        device_statuses[node_id]+="-->retrying commissioning.."
+
+
     
-    chip_lock.release()
 
 
 def check_for_firmware_version(node_id):
@@ -143,13 +192,20 @@ def check_for_firmware_version(node_id):
             break
 
     # print("\nS/W version: " + str(sw_ver) + "for" +str(node_id), end="")
-    if(float(sw_ver)>0 and current_state[index]== device_state.getting_old_firmware):
-        device_statuses[node_id]+= "-->has software version:" + str(sw_ver)
-        current_state[node_id-base_nodeid]=device_state.got_old_firmware
-    
-    if(float(sw_ver)>0 and current_state[index]== device_state.getting_new_firmware):
-        device_statuses[node_id]+= "-->has software version:" + str(sw_ver)
-        current_state[node_id-base_nodeid]=device_state.got_new_firmware
+    if float(sw_ver)>0 :
+        if current_state[index]== device_state.getting_old_firmware:
+            device_statuses[node_id]+= "-->has software version:" + str(sw_ver)
+            current_state[node_id-base_nodeid]=device_state.got_old_firmware
+        elif current_state[index]== device_state.getting_new_firmware:
+            device_statuses[node_id]+= "-->has new software version:" + str(sw_ver)
+            current_state[node_id-base_nodeid]=device_state.got_new_firmware
+    else:
+        if current_state[index]== device_state.getting_old_firmware:
+            # current_state[node_id-base_nodeid]=device_state.getting_old_firmware
+            device_statuses[node_id]+= "-->retrying s/w ver fetch..."
+        elif current_state[index]== device_state.getting_new_firmware:
+            # current_state[node_id-base_nodeid]=device_state.getting_new_firmware
+            device_statuses[node_id]+= "-->retrying new s/w ver fetch..."
     
     chip_lock.release()
 
@@ -157,14 +213,14 @@ def check_for_firmware_version(node_id):
 def trigger_ota(node_id, ota_provider_node_id):
 
     index = node_id-base_nodeid
-    time.sleep(25)
+    time.sleep(10)
     ota_lock.acquire(timeout=700)
     chip_lock.acquire()
     color_change_command = ['chip-tool', 'colorcontrol', 'move-to-hue', '120','0', '0', '0', '0', str(node_id), '0x1']
     result = subprocess.run(color_change_command, capture_output=True, text=True)
     
     time.sleep(10)
-    current_state[index] = device_state.waiting_for_ota_complete
+    current_state[index] = device_state.ongoing_ota
 
     ota_trigger_command = ['chip-tool', 'otasoftwareupdaterequestor', 'announce-otaprovider', ota_provider_node_id, '0', '0', '0', str(node_id), '0x0']
 
@@ -190,21 +246,21 @@ def check_for_ota_percentage(node_id):
     if str(ota_progress)!='null' and int(ota_progress)>=0:
         ota_progress_tracker [index][int(ota_progress)]+=1
         if(ota_progress_tracker [index][int(ota_progress)]>=4):
-            error_(node_id)
+            error_(node_id,"during OTA.")
     elif str(ota_progress)=='null':
         ota_null_tracker [index]+=1
         if(ota_null_tracker [index]>=4):
-            error_(node_id)
+            error_(node_id,"in starting OTA.")
 
 
 
 
-    if current_state[node_id-base_nodeid]==device_state.waiting_for_ota_complete:
+    if current_state[node_id-base_nodeid]==device_state.ongoing_ota:
 
         if(device_statuses[node_id][-1]=='%'):
             device_statuses[node_id]=device_statuses[node_id][:-23]
         
-        device_statuses[node_id]+="--> ota progress at "+ str(ota_progress)+"%"
+        device_statuses[node_id]+="-->ota progress at "+ str(ota_progress)+"%"
 
         if str(ota_progress)!='null' and int(ota_progress)>=90:
             chip_lock.acquire()
@@ -213,7 +269,7 @@ def check_for_ota_percentage(node_id):
             chip_lock.release()
             time.sleep(5)
             current_state[node_id-base_nodeid]=device_state.ota_completed
-            device_statuses[node_id]+="--> ota completing..."
+            device_statuses[node_id]+="-->ota completing..."
 
     if current_state[node_id-base_nodeid]==device_state.ota_completed:
         return ota_progress
@@ -259,7 +315,7 @@ def setup_for_ota(pairing_codes):
     # Wait for all threads to finish
     for thread in threads:
 
-        thread.join(1000)
+        thread.join()
 
 
 
@@ -283,7 +339,7 @@ def main(stdscr):
                 node_id = base_nodeid + index
                 status = device_statuses[node_id]
 
-                stdscr.addstr(index*2, 0,f"{node_id} : {pairing_codes[index]} : {status}")
+                stdscr.addstr(index*5, 0,f"{node_id} : {pairing_codes[index]} : {status}")
 
             stdscr.refresh()
             time.sleep(1)  # Adjust the sleep interval as needed
