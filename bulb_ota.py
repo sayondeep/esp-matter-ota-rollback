@@ -58,15 +58,21 @@ ota_lock = Lock()
 def error_(node_id,reason):
 
     index = node_id-base_nodeid
-    
-    chip_lock.acquire()
-    color_change_command = ['chip-tool', 'colorcontrol', 'move-to-hue', '0','0', '0', '0', '0', str(node_id), '0x1']
-    result = subprocess.run(color_change_command, capture_output=True, text=True)
-    
     current_state[index] = device_state.operation_completed
-    device_statuses[node_id] += "-->Error Occured." + str(reason)
-    chip_lock.release()
+    device_statuses[node_id] += "-->Error Occured " + str(reason)
+
+    if 'fetching' in reason:
+        chip_lock.acquire()
+        color_change_command = ['chip-tool', 'colorcontrol', 'move-to-hue', '0','0', '0', '0', '0', str(node_id), '0x1']
+        result = subprocess.run(color_change_command, capture_output=True, text=True)
+        chip_lock.release()
+
+
     if 'OTA' in reason:
+        chip_lock.acquire()
+        color_change_command = ['chip-tool', 'colorcontrol', 'move-to-hue', '0','0', '0', '0', '0', str(node_id), '0x1']
+        result = subprocess.run(color_change_command, capture_output=True, text=True)
+        chip_lock.release()
         ota_lock.release()
 
 def perform_operations(node_id,qr_code):
